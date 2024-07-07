@@ -1,0 +1,4 @@
+.env
+.vscode
+deprecated
+__pycache__
