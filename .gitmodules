@@ -1,0 +1,3 @@
+[submodule "TypeChat"]
+	path = TypeChat
+	url = https://github.com/irides777/TypeChat.git
