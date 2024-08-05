@@ -1,3 +1,3 @@
-[submodule "TypeChat"]
-	path = TypeChat
-	url = https://github.com/irides777/TypeChat.git
+[submodule "dspy-ai"]
+	path = dspy-ai
+	url = https://github.com/stanfordnlp/dspy.git
