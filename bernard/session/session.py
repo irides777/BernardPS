@@ -2,12 +2,12 @@
 import dspy
 from pydantic import BaseModel, RootModel, Field, model_serializer, field_validator, ValidationInfo
 
-from typing import Annotated, NamedTuple, Literal, Optional, Union
+from typing import Annotated, NamedTuple, Literal, Optional, Union, TypedDict
 
 from .dialogue import Dialogue
 from .llm import SessionEndSig
 
-class SessionContext(BaseModel):
+class SessionContext(TypedDict):
     dialogue: Dialogue
 
 

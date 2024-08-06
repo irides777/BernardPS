@@ -17,3 +17,6 @@ class DialogueRouter:
         intent = self.intent_router(dialogue=dialogue).intent
         logging.info(f'Intent: {intent}')
         await self.server[intent].process_dialogue(dialogue=dialogue)
+    
+    async def direct_process(self, dialogue: Dialogue, intent: str):
+        await self.server[intent].process_dialogue(dialogue=dialogue)

@@ -1,1 +1,1 @@
-from .schedule_server import ScheduleEventServer
+from .event_server import ScheduleEventServer

@@ -20,12 +20,12 @@ class ScheduleEventCheckerSig(dspy.Signature):
     faithfulness: bool = dspy.OutputField(desc="Only output True or False indicating if scheduled event is faithful to dialogue, other redundant information should be ignored.")
 
 
-class ScheduleEventConfirmSig(dspy.Signature):
+class GeneralConfirmationSig(dspy.Signature):
     """  
-    check if user's last reply has confirmed the event, or mentioned event revise
+    check if user's last reply has confirmed the assistant's query, or mentioned any revise
     """
     dialogue: Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time")
-    confirmation: bool = dspy.OutputField(desc="True/False indicating if user's last reply confirm the event. Any revise or termination mentioned should return False")
+    confirmation: bool = dspy.OutputField(desc="True/False indicating if user's last reply confirm the assistant's query. Any revise or termination mentioned should return False")
 
 
 class ScheduleEventLLM(dspy.Module):
