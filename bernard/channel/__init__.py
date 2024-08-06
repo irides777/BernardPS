@@ -1,1 +1,1 @@
-from .channel import CMDInterface
+from .channel import Channel

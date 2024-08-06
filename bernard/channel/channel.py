@@ -5,13 +5,14 @@ from ..session import SessionContext, Dialogue, Message, SessionEndDiscriminator
 
 WEEKDAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 
-class CMDInterface:
-    def __init__(self, router) -> None:
+class Channel:
+    def __init__(self, router, ui) -> None:
         self.workers = {}
         self.router = router
         self.session_end_disc = SessionEndDiscriminator()
         self.current_session = None
         self.history_sessions = []
+        self.ui = ui
     
     def _wrap_msg(self, msg, sender: Literal['User', 'Assistant']):
         return Message.model_validate({'role': sender, 'content': msg, 'date': dt.datetime.now().date(), 'time': dt.datetime.now().time().replace(microsecond=0), 'weekday': WEEKDAYS[dt.datetime.now().weekday()]})
@@ -36,22 +37,22 @@ class CMDInterface:
         await self.router.route(dialogue=dialogue)
 
     def send_to_user(self, msg):
-        print('assistant:' + msg)
+        self.ui.send(msg)
         wrapped_msg = self._wrap_msg(msg, 'Assistant')
         self._session_update(wrapped_msgs=[wrapped_msg])
 
 
     async def send_wait_reply(self, msg) -> Dialogue:
-        print('assistant:' + msg)
+        self.ui.send(msg)
         wrapped_msg = self._wrap_msg(msg, 'Assistant')
-        reply = input('user:')
+        reply = await self.ui.receive()
         wrapped_reply = self._wrap_msg(reply, 'User')
 
         self._session_update(wrapped_msgs=[wrapped_msg, wrapped_reply])
         return self.current_session.dialogue
 
     async def wait_for_msg(self):
-        msg = input('user:')
+        msg = await self.ui.receive()
 
         wrapped_msg = self._wrap_msg(msg, 'User')
         self._session_update(wrapped_msgs=[wrapped_msg])

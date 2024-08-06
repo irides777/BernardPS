@@ -9,13 +9,15 @@ import asyncio
 
 from bernard.router import DialogueRouter
 from bernard.server import ScheduleEventServer, GeneralChatServer
-from bernard.channel import CMDInterface
+from bernard.channel import Channel
+from bernard.ui import CmdUI
 
 
 router = DialogueRouter()
-ui = CMDInterface(router)
-router.add_server('Schedule Event', ScheduleEventServer(ui))
-router.add_server('Chat', GeneralChatServer(ui))
+cmd_ui = CmdUI()
+channel = CMDInterface(router=router, ui=cmd_ui)
+router.add_server('Schedule Event', ScheduleEventServer(channel))
+router.add_server('Chat', GeneralChatServer(channel))
 
 lm = dspy.OpenAI(model='qwen-plus', api_base='https://dashscope.aliyuncs.com/compatible-mode/v1', api_key=os.getenv('DASHSCOPE_API_KEY'), model_type='chat')
 dspy.settings.configure(lm=lm)
@@ -23,4 +25,4 @@ dspy.settings.configure(lm=lm)
 if __name__ == '__main__':
     logging.basicConfig(filename='myapp.log', level=logging.INFO)
     while True:
-        asyncio.run(ui.wait_for_msg())
+        asyncio.run(channel.wait_for_msg())
