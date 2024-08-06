@@ -2,7 +2,8 @@
 import dspy
 from pydantic import BaseModel, RootModel, Field, model_serializer, field_validator, ValidationInfo
 
-from typing import Annotated, NamedTuple, Literal, Optional, Union, TypedDict
+from typing import Annotated, Any, NamedTuple, Literal, Optional, Union
+from typing_extensions import TypedDict
 
 from .dialogue import Dialogue
 from .llm import SessionEndSig

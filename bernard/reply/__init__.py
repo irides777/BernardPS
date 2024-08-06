@@ -1,1 +1,1 @@
-from .llm import ReplyQuerySig, ReplyInformationConfirmSig
+from .llm import ReplyQuerySig, ReplyInformationConfirmSig, ReplyActionConfirmationSig

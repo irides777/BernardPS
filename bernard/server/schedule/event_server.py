@@ -4,8 +4,8 @@ from typing import Optional
 import dspy
 
 from ...session import Dialogue
-from ...reply import ReplyInformationConfirmSig, ReplyQuerySig
-from .llm import ScheduleEventLLM, GeneralConfirmationSig
+from ...reply import ReplyInformationConfirmSig, ReplyQuerySig, ReplyActionConfirmationSig
+from .event_llm import ScheduleEventLLM
 from .reminder import BaseReminder
 from .base_event import BaseScheduleEvent
 from .event import ScheduleEvent
@@ -16,8 +16,7 @@ class ScheduleEventServer:
         self.name = 'Create Schedule Event'
         self.channel = channel
         self.event_creator = ScheduleEventLLM().activate_assertions(max_backtracks=1)
-        self.event_confirmor = dspy.TypedPredictor(GeneralConfirmationSig)
-        self.reply_confirm = dspy.TypedPredictor(ReplyInformationConfirmSig)
+        self.reply_confirm = dspy.TypedPredictor(ReplyActionConfirmationSig)
         self.reply_query = dspy.TypedPredictor(ReplyQuerySig)
 
     def add_event(self, base_event: BaseScheduleEvent):
@@ -30,10 +29,10 @@ class ScheduleEventServer:
         logging.info(f'Event created: {base_event}')
         unknown_fields = base_event.unknown_fields()
         if len(unknown_fields) == 0:
-            reply_for_confirmation = self.reply_confirm(dialogue=dialogue, information_need_check=base_event).reply
-            dialogue_after_confirm = await self.channel.send_wait_reply(reply_for_confirmation)
-            if self.event_confirmor(dialogue=dialogue_after_confirm).confirmation:
-                self.channel.router.direct_process(dialogue=dialogue, intent='Create Time Reminder')
+            reply_for_reminder_confirmation = self.reply_confirm(dialogue=dialogue, action="create reminder for talked event").reply
+            dialogue_after_confirm, confirm = await self.channel.send_wait_confirm(reply_for_reminder_confirmation)
+            if confirm:
+                await self.channel.router.direct_process(dialogue=dialogue, intent='Create Time Reminder')
                 # if 'reminder' in self.channel.current_session:
                 #     reminder = self.channel.current_session['reminder']:
                 self.add_event(base_event=base_event)
