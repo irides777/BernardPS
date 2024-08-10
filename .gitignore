@@ -4,3 +4,5 @@ deprecated
 __pycache__
 myapp.log
 dspy.ipynb
+local_cache
+test.py

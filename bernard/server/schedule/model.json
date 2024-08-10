@@ -1,0 +1,61 @@
+{
+  "self": {
+    "lm": null,
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "current_weekday": "Sat",
+        "relative_weekday_or_date": "\u4e0b\u4e0b\u5468\u4e94",
+        "rationale": "produce the date delta. We start from Saturday, and \"\u4e0b\u4e0b\u5468\u4e94\" means the Friday of the week after next. Since there are 7 days in a week, moving to next Friday would be 7 days from now. However, since we need to go one more week ahead to reach \"the week after next,\" we add another 7 days, making it 14 days in total. Then, because today is Saturday, we need to move forward to Friday, which is minus 1 day. Thus, the total delta is 14 - 1 = 13 days.",
+        "date_delta": "13"
+      },
+      {
+        "augmented": true,
+        "current_weekday": "Wed",
+        "relative_weekday_or_date": "\u8fd9\u5468\u5929",
+        "rationale": "produce the date delta. We start on Wednesday and need to find the difference to this Sunday. Since Sunday is at the end of the week and today is Wednesday, we count the days until Sunday: Thursday (1 day), Friday (2 days), Saturday (3 days), and Sunday (4 days).",
+        "date_delta": "4"
+      },
+      {
+        "augmented": true,
+        "current_weekday": "Fri",
+        "relative_weekday_or_date": "\u5468\u5929",
+        "rationale": "produce the date delta. We start from Friday and move to Sunday, which is 2 days ahead in the same week.",
+        "date_delta": "2"
+      },
+      {
+        "augmented": true,
+        "current_weekday": "Tue",
+        "relative_weekday_or_date": "\u5468\u4e94",
+        "rationale": "produce the date delta. We start on Tuesday and need to find the delta to Friday. Since there are 4 weekdays from Tuesday to Friday (Tuesday, Wednesday, Thursday, Friday), the delta is 3 days.",
+        "date_delta": "3"
+      },
+      {
+        "current_weekday": "Thu",
+        "relative_weekday_or_date": "\u4e0b\u5468\u4e8c",
+        "date_delta": "5"
+      },
+      {
+        "current_weekday": "Mon",
+        "relative_weekday_or_date": "\u5927\u540e\u5929",
+        "date_delta": "3"
+      },
+      {
+        "current_weekday": "Sat",
+        "relative_weekday_or_date": "\u4e0b\u5468\u516d",
+        "date_delta": "7"
+      },
+      {
+        "current_weekday": "Sun",
+        "relative_weekday_or_date": "\u4e0b\u4e2a\u5468\u4e00",
+        "date_delta": "1"
+      }
+    ],
+    "signature_instructions": "Given the fields `current_weekday`, `relative_weekday_or_date`, produce the fields `date_delta`.",
+    "signature_prefix": "Date Delta:",
+    "extended_signature_instructions": "Given the fields `current_weekday`, `relative_weekday_or_date`, produce the fields `date_delta`.",
+    "extended_signature_prefix": "Date Delta:"
+  }
+}

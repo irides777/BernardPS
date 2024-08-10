@@ -4,13 +4,14 @@ from typing import Literal
 import datetime as dt
 from ..session import SessionContext, Dialogue, Message, SessionEndDiscriminator
 from .channel_llm import GeneralConfirmationSig, LanguageTranslatorSig
+from ..router import DialogueRouter
 
 WEEKDAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 
 class Channel:
-    def __init__(self, router, ui) -> None:
+    def __init__(self, ui) -> None:
         self.workers = {}
-        self.router = router
+        self.router = DialogueRouter(self)
         self.session_end_disc = SessionEndDiscriminator()
         self.confirmor = dspy.TypedPredictor(GeneralConfirmationSig)
         self.translator = dspy.TypedPredictor(LanguageTranslatorSig)
@@ -21,24 +22,30 @@ class Channel:
     def _wrap_msg(self, msg, sender: Literal['User', 'Assistant']):
         return Message.model_validate({'role': sender, 'content': msg, 'date': dt.datetime.now().date(), 'time': dt.datetime.now().time().replace(microsecond=0), 'weekday': WEEKDAYS[dt.datetime.now().weekday()]})
 
-    def _session_update(self, wrapped_msgs: list[Message]):
-        if not self.current_session:
-            dialogue = Dialogue.model_validate(wrapped_msgs)
-            self.current_session = SessionContext(dialogue=dialogue)
-        else:
-            self.current_session['dialogue'].root.extend(wrapped_msgs)
+    def start_new_session(self, first_wrapped_msg: Message):
+        print('new session started.')
+        dialogue = Dialogue.model_validate([first_wrapped_msg])
+        self.current_session = SessionContext(dialogue=dialogue, intent=None)
+    
+    def end_current_session(self):
+        self.history_sessions.append(self.current_session)
+        self.current_session = None
+        print('current session ended.')
 
-    async def route(self, dialogue: Dialogue):
+    def _session_update(self, wrapped_msgs: list[Message]):
+        self.current_session['dialogue'].root.extend(wrapped_msgs)
+
+
+    async def route(self):
         if self.current_session:
-            is_session_ended = self.session_end_disc.is_session_ended(dialogue)
+            is_session_ended = self.session_end_disc.is_session_ended(self.current_session['dialogue'])
         else:
             is_session_ended = False
         if is_session_ended:
-            print('session ended!')
-            self.history_sessions.append(self.current_session)
-            dialogue.root = dialogue.root[-1:]
-            self.current_session = SessionContext(dialogue=dialogue)
-        await self.router.route(dialogue=dialogue)
+            last_msg = self.current_session['dialogue'].root[-1]
+            self.end_current_session()
+            self.start_new_session(first_wrapped_msg=last_msg)
+        await self.router.route()
 
     def send_to_user(self, msg):
         msg = self.translator(dialogue=self.current_session['dialogue'], reply=msg).translated_reply
@@ -66,5 +73,8 @@ class Channel:
         msg = await self.ui.receive()
 
         wrapped_msg = self._wrap_msg(msg, 'User')
-        self._session_update(wrapped_msgs=[wrapped_msg])
-        await self.route(self.current_session['dialogue'])
+        if self.current_session is None:
+            self.start_new_session(first_wrapped_msg=wrapped_msg)
+        else:
+            self._session_update(wrapped_msgs=[wrapped_msg])
+        await self.route()
