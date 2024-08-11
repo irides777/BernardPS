@@ -71,13 +71,13 @@ class ReminderLLM(dspy.Module):
             reminder_date = 'unknown'
         else:
             print('deal with: ', raw_reminder_date)
-            date_delta = relative_date_cal(current_weekday=dialogue.root[-1].weekday, relative_weekday_or_date=raw_reminder_date).date_delta
+            date_delta = relative_date_cal(current_weekday=dialogue.weekday, relative_weekday_or_date=raw_reminder_date).date_delta
             # retract integer in date_delta
             print(date_delta)
             date_delta = re.search(r"\d+", date_delta).group()
             print(date_delta)
             date_delta = int(date_delta)
-            reminder_date = (dialogue.root[-1].date + dt.timedelta(days=date_delta)).strftime('%Y-%m-%d')
+            reminder_date = (dialogue.date + dt.timedelta(days=date_delta)).strftime('%Y-%m-%d')
 
         reminder_time = self.reminder_time_constructor(dialogue=dialogue).reminder_time
         print(reminder_time)
@@ -111,7 +111,7 @@ class ReminderServer:
             # dialogue_after_confirm, confirm = await self.channel.send_wait_confirm(reply_for_confirmation)
             # if confirm:
             self.add_reminder(reminder=reminder)
-            self.channel.send_to_user('reminder created successfully!')
+            self.channel.send_to_user(f'reminder {reminder} created successfully!')
             self.channel.end_current_session()
             # else:
             #     await self.channel.route(dialogue=dialogue_after_confirm)
