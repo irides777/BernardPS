@@ -6,8 +6,14 @@ import datetime as dt
 class Message(BaseModel):
     role: Literal['User', 'Assistant']
     content: str
-    date: Optional[dt.date] = None
-    time: Optional[dt.time] = None
-    weekday: Optional[Literal['Mon','Tue','Wed','Thu','Fri','Sat','Sun']]
+    # date: Optional[dt.date] = None
+    # time: Optional[dt.time] = None
+    # weekday: Optional[Literal['Mon','Tue','Wed','Thu','Fri','Sat','Sun']]
     
-Dialogue = RootModel[list[Message]]
+# Dialogue = RootModel[list[Message]]
+
+class Dialogue(BaseModel):
+    root: list[Message]
+    date: dt.date
+    time: dt.time
+    weekday: Literal['Mon','Tue','Wed','Thu','Fri','Sat','Sun']

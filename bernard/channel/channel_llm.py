@@ -11,8 +11,9 @@ class GeneralConfirmationSig(dspy.Signature):
 
 class LanguageTranslatorSig(dspy.Signature):
     """  
-    Translate the reply from auto generated to user's language. If the reply is the same as user's, just return the original reply.
+    Translate the reply from auto generated to Chinese. If the reply is already Chinese, just return the original reply. DO NOT ADD ANYTHING RATHER THAN ORIGINAL REPLY.
     """
+    # Translate the reply from auto generated to user's language . If the reply is the same as user's, just return the original reply.
     dialogue: Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time")
     reply: str = dspy.InputField(desc="The reply from auto generated")
     translated_reply: str = dspy.OutputField(desc="The reply translated to user's language. If the reply is the same as user's, just return the original reply, DON'T ADD ANYTHING RATHER THAN ORIGINAL REPLY.")

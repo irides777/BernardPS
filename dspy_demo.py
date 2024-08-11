@@ -23,12 +23,12 @@ channel.router.add_server('Chat', GeneralChatServer(channel))
 lm = dspy.OpenAI(model='qwen-plus', api_base='https://dashscope.aliyuncs.com/compatible-mode/v1', api_key=os.getenv('DASHSCOPE_API_KEY'), model_type='chat')
 dspy.settings.configure(lm=lm)
 
-class RelativeDateRetractSig(dspy.Signature):
-    """
-    You are user's assistant, user is setting some schedule in previous dilogue, please extract the detail of date user mentioned in message, fill the relevant information to construct a date for storing into database. If user have not mentioned information about relative date, just fill it with 'unknown'.
-    """
-    dialogue: dspy.Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time")
-    relative_date: dspy.Date = dspy.OutputField(desc="the relative date user want to set. If there is insuffcient information to fill a field, just fill it with 'unknown'.")
+# class RelativeDateRetractSig(dspy.Signature):
+#     """
+#     You are user's assistant, user is setting some schedule in previous dilogue, please extract the detail of date user mentioned in message, fill the relevant information to construct a date for storing into database. If user have not mentioned information about relative date, just fill it with 'unknown'.
+#     """
+#     dialogue: dspy.Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time")
+#     relative_date: dspy.Date = dspy.OutputField(desc="the relative date user want to set. If there is insuffcient information to fill a field, just fill it with 'unknown'.")
 
 
 if __name__ == '__main__':
@@ -37,5 +37,4 @@ if __name__ == '__main__':
     # optimized_program = teleprompter.compile(pred, trainset=trainset)
     # optimized_program.save('model.json')
     # print(optimized_program(current_weekday='Sat', relative_weekday_or_date='下下周五').date_delta)
-    while True:
-        asyncio.run(channel.wait_for_msg())
+    asyncio.run(channel.run())

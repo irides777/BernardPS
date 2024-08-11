@@ -16,14 +16,14 @@ from .datetime import relative_date_cal
 
 class ReminderContentConstructorSig(dspy.Signature):
     """   
-    You are user's assistant, user is setting a reminder, please extract the detail of reminder content user mentioned in dialogue. 
+    You are user's assistant, user is setting a reminder, please extract the detail of reminder content user mentioned in dialogue. The return should be the same language as user's input. 
     """
     dialogue: Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time")
     reminder_content: str = dspy.OutputField(desc="The remind content user want to set, be brief and clear, do not add any explanation or title. If user doesn't mention specific content, just fill it with 'reminder'.")
 
 class ReminderDateConstructorSig(dspy.Signature):
     """   
-    You are user's assistant, user is setting a reminder, please extract the date (time is not required) of reminder user mentioned in dialogue.
+    You are user's assistant, user is setting a reminder, please extract the date (time is not required) of reminder user mentioned in dialogue. The return should be the same language as user's input (except 'unknown'). 
     """
     dialogue: Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time")
     reminder_date: Union[dt.date, str] = dspy.OutputField(desc="The reminder date user want to set. Notice: if the date user mentioned is weekday related (e.g. next Wed, 这周五), you don't need to transform relative date into absolute date, just return exactly what user said. Otherwise, If user mentioned absolute date, return the date in format 'YYYY-MM-DD', with the current date information mentioned in dialogue. If there is insuffcient information to fill a field, just fill it with 'unknown'. DO NOT ADD ANY EXPLANATION.")
@@ -73,6 +73,7 @@ class ReminderLLM(dspy.Module):
             print('deal with: ', raw_reminder_date)
             date_delta = relative_date_cal(current_weekday=dialogue.root[-1].weekday, relative_weekday_or_date=raw_reminder_date).date_delta
             # retract integer in date_delta
+            print(date_delta)
             date_delta = re.search(r"\d+", date_delta).group()
             print(date_delta)
             date_delta = int(date_delta)
@@ -100,6 +101,7 @@ class ReminderServer:
 
     def add_reminder(self, reminder: BaseReminder):
         print(f'Reminder added: {reminder}')
+        self.channel.reminders.append(reminder)
     
     async def process_dialogue(self, dialogue: Dialogue):
         reminder = self.reminder_creator(dialogue=dialogue)
