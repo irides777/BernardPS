@@ -6,13 +6,16 @@ from ...session import SessionContext
 from .event import BaseScheduleEvent
 
 WEEKDAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+LLMDate = Union[dt.date, Literal['unknown']]
+LLMTime = Union[dt.time, Literal['unknown']]
 
-class BaseReminder(BaseModel):
-    # relative_event: BaseScheduleEvent
-    remind_content: str
-    remind_date: Union[dt.date, Literal['unknown']]
-    remind_time: Union[dt.time, Literal['unknown']]
-    remind_weekday: Literal["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] = Field(default=None)
+class BaseTask(BaseModel):
+    task_content: str
+    deadline_date: LLMDate
+    first_step: str
+    next_remind_date: LLMDate
+    next_remind_time: LLMTime
+    # remind_weekday: Literal["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] = Field(default=None)
 
 
     @model_validator(mode='after')
@@ -31,4 +34,20 @@ class BaseReminder(BaseModel):
             if i[1] == 'unknown':
                 ret.append(i[0])
         return ret
+
+class BaseProgress(BaseModel):
+    task_current_progress: str
+    last_step_finished: bool
+    progress_update_date: LLMDate
+    next_step: str
+    next_remind_date: LLMDate
+    next_remind_time: LLMTime
+
+class Task(BaseModel):
+    basetask: BaseTask
+    progresses: list[BaseProgress]
+    next_remind_date: dt.date
+    next_remind_time: dt.time
+
+
     

@@ -1,0 +1,40 @@
+8/13
+U：9月底需要提交论文
+A：（task：提交论文，DDL: 9/31， next_remind_time: unknown, first_step: unknown）
+U：这周六提醒我，首先准备开题报告
+A：（task：提交论文，DDL: 9/31， next_remind_time: 8/17, first_step: 准备开题报告）
+
+U：秋招开始了，要先准备简历
+A：（task：秋招，DDL：unknown， next_remind_time: unknown, first_step: 准备简历）
+U：9月15号， 这周六提醒我
+A：（task：秋招，DDL：9/15， next_remind_time: 8/17, first_step: 准备简历）
+
+8/16
+U： 秋招简历准备好了
+A：（update date: 8/16 progress: 简历准备好了, current step finished: true, 
+    next_remind_time: unknown, next_step: unknown）
+U：后天，投递简历
+A：（update date: 8/16 progress: 简历准备好了, current step finished: true, 
+    next_remind_time: 8/18, next_step:投递简历）
+
+8/17
+A：remind first_step, task 论文, ask for progress
+U：还没开始
+A: (update date: 8/17 progress: 还没开始, current step finished: false next_remind_date: unknown)
+U: 周三提醒我
+A: (update date: 8/17 progress: 还没开始, current step finished: false next_remind_date: 8/21)
+
+8/18 10：00
+A: remind 投递简历，task 秋招， ask for progress
+U：还没投，下午提醒我投 
+A: (update date: 8/18 progress: 还没投, current step finished: false next_remind_date: 8/18, 
+    next_remind_time: unknown)
+U：两点
+
+
+8/18 14：00
+A: remind 投递简历，task 秋招， ask for progress
+U：正在投
+A: (update date: 8/18 progress: 正在投, current step finished: false next_remind_date: unknown)
+U：今晚
+
