@@ -21,6 +21,7 @@ class Channel:
         self.current_session = None
         self.history_sessions = []
         self.reminders = []
+        self.tasks = []
         self.ui = ui
     
     def _wrap_msg(self, msg, sender: Literal['User', 'Assistant']):

@@ -21,3 +21,19 @@ class WeekdayCalSig(dspy.Signature):
 
 relative_date_cal = dspy.ChainOfThought(WeekdayCalSig)
 relative_date_cal.load('/home/irides/project/secretary/bernard/server/schedule/model.json')
+
+def process_raw_date(raw_date: str) -> str:
+    if type(raw_date) is dt.date or re.compile(r"^\d{4}-\d{2}-\d{2}$").match(raw_date):
+        date = raw_date
+    elif raw_date == 'unknown':
+        date = 'unknown'
+    else:
+        print('deal with: ', raw_date)
+        date_delta = relative_date_cal(current_weekday=dialogue.weekday, relative_weekday_or_date=raw_date).date_delta
+        # retract integer in date_delta
+        print(date_delta)
+        date_delta = re.search(r"\d+", date_delta).group()
+        print(date_delta)
+        date_delta = int(date_delta)
+        date = (dialogue.date + dt.timedelta(days=date_delta)).strftime('%Y-%m-%d')
+    return date

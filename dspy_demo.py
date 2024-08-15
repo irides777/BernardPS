@@ -10,7 +10,7 @@ import asyncio
 # from pydantic import BaseModel, RootModel, Field, model_serializer, field_validator, ValidationInfo
 
 from bernard.router import DialogueRouter
-from bernard.server import ScheduleEventServer, GeneralChatServer, ReminderServer
+from bernard.server import ScheduleEventServer, GeneralChatServer, ReminderServer, TaskServer
 from bernard.channel import Channel
 from bernard.ui import CmdUI
 
@@ -18,6 +18,7 @@ from bernard.ui import CmdUI
 cmd_ui = CmdUI()
 channel = Channel(ui=cmd_ui)
 channel.router.add_server('Create Time Reminder', ReminderServer(channel))
+channel.router.add_server('Create Task', TaskServer(channel))
 channel.router.add_server('Chat', GeneralChatServer(channel))
 
 lm = dspy.OpenAI(model='qwen-plus', api_base='https://dashscope.aliyuncs.com/compatible-mode/v1', api_key=os.getenv('DASHSCOPE_API_KEY'), model_type='chat')
