@@ -9,8 +9,22 @@ A：（task：秋招，DDL：unknown， next_remind_time: unknown, first_step: �
 U：9月15号， 这周六提醒我
 A：（task：秋招，DDL：9/15， next_remind_time: 8/17, first_step: 准备简历）
 
+U: 我打算每周花点时间读书
+A：（habit：每周读书，period: 7天）
+
+8/13 10:00
+U: 下午两点提醒我吃饭
+A：（reminder：吃饭，time：8/13 14：00）
+
+8/13 14:00
+A：reminder 吃饭
+U: 30分钟后再提醒我
+A：（reminder: 再提醒吃饭，time：8/13 14：30）
+
+
 8/16
 U： 秋招简历准备好了
+A task list: [提交论文，秋招] -> 秋招
 A：（update date: 8/16 progress: 简历准备好了, current step finished: true, 
     next_remind_time: unknown, next_step: unknown）
 U：后天，投递简历
