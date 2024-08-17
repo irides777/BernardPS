@@ -10,7 +10,7 @@ import asyncio
 # from pydantic import BaseModel, RootModel, Field, model_serializer, field_validator, ValidationInfo
 
 from bernard.router import DialogueRouter
-from bernard.server import ScheduleEventServer, GeneralChatServer, ReminderServer, TaskServer
+from bernard.server import GeneralChatServer, ReminderServer, TaskServer
 from bernard.channel import Channel
 from bernard.ui import CmdUI, WxautoUI
 
@@ -30,10 +30,10 @@ channel.router.add_server('Create Time Reminder', ReminderServer(channel))
 channel.router.add_server('Create Task', TaskServer(channel))
 channel.router.add_server('Chat', GeneralChatServer(channel))
 
-wx_ui2 = WxautoUI(wx_window=wx, user_name='123')
-channel2 = Channel(ui=wx_ui2)
-channel2.router.add_server('Create Time Reminder', ReminderServer(channel2))
-channel2.router.add_server('Chat', GeneralChatServer(channel2))
+# wx_ui2 = WxautoUI(wx_window=wx, user_name='123')
+# channel2 = Channel(ui=wx_ui2)
+# channel2.router.add_server('Create Time Reminder', ReminderServer(channel2))
+# channel2.router.add_server('Chat', GeneralChatServer(channel2))
 
 lm = dspy.OpenAI(model='qwen-plus', api_base='https://dashscope.aliyuncs.com/compatible-mode/v1', api_key=os.getenv('DASHSCOPE_API_KEY'), model_type='chat')
 dspy.settings.configure(lm=lm)
@@ -47,8 +47,8 @@ dspy.settings.configure(lm=lm)
 
 async def main():
     task1 = asyncio.create_task(channel.run())
-    task2 = asyncio.create_task(channel2.run())
-    await asyncio.gather(task1, task2)
+    # task2 = asyncio.create_task(channel2.run())
+    await asyncio.gather(task1)
 
 
 if __name__ == '__main__':

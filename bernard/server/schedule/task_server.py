@@ -8,8 +8,8 @@ from typing import Union, Literal
 
 from ...session import Dialogue
 from ...reply import ReplyInformationConfirmSig, ReplyQuerySig
+from ..request import RequestServer
 from .task import BaseTask
-from .event import ScheduleEvent
 from .datetime import relative_date_cal, process_raw_date
 
 
@@ -39,7 +39,7 @@ class TaskNextRemindDateConstructorSig(dspy.Signature):
     You are user's assistant, user is scheduling a task, with a specific deadline. You need to remind the task to user after a while. Please extract the next remind date of task user mentioned in dialogue. The return should be the same language as user's input (except 'unknown'). 
     """
     dialogue: Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time")
-    next_remind_date: Union[dt.date, str] = dspy.OutputField(desc="The next remind date of task (Notice: not the deadline of task) user mentioned. Notice: if the date user mentioned is weekday related (e.g. next Wed, 这周五), you don't need to transform relative date into absolute date, just return exactly what user said. Otherwise, If user mentioned absolute date, return the date in format 'YYYY-MM-DD', with the current date information mentioned in dialogue. If there is insuffcient information to fill a field, just fill it with 'unknown'. DO NOT ADD ANY EXPLANATION.")
+    next_remind_date: Union[dt.date, str] = dspy.OutputField(desc="The next remind date of task user mentioned. Caution: remind date is NOT the deadline date, if user only mentioned deadline date, please fill this field with 'unknown'. Notice: if the date user mentioned is weekday related (e.g. next Wed, 这周五), you don't need to transform relative date into absolute date, just return exactly what user said. Otherwise, If user mentioned absolute date, return the date in format 'YYYY-MM-DD', with the current date information mentioned in dialogue. If there is insuffcient information to fill a field, just fill it with 'unknown'. DO NOT ADD ANY EXPLANATION.")
 
 
 class TaskNextRemindTimeConstructorSig(dspy.Signature):
@@ -85,8 +85,8 @@ class TaskLLM(dspy.Module):
         print(raw_task_deadline_date)
         raw_task_next_remind_date = self.task_next_remind_date_constructor(dialogue=dialogue).next_remind_date
         print(raw_task_next_remind_date)
-        task_deadline_date = process_raw_date(raw_task_deadline_date)
-        task_next_remind_date = process_raw_date(raw_task_next_remind_date)
+        task_deadline_date = process_raw_date(dialogue=dialogue, raw_date=raw_task_deadline_date)
+        task_next_remind_date = process_raw_date(dialogue=dialogue, raw_date=raw_task_next_remind_date)
 
         task_next_remind_time = self.task_next_remind_time_constructor(dialogue=dialogue).next_remind_time
         print(task_next_remind_time)

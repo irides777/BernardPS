@@ -1,6 +1,8 @@
 
 from pydantic import BaseModel
+import dspy
 from ..reply import ReplyInformationConfirmSig, ReplyQuerySig
+from ..session import Dialogue
 
 class LLMRequest(BaseModel):
 
@@ -30,7 +32,7 @@ class RequestServer:
             # dialogue_after_confirm, confirm = await self.channel.send_wait_confirm(reply_for_confirmation)
             # if confirm:
             self.add_request(request=request)
-            self.channel.send_to_user(f'{reminder} created successfully!')
+            self.channel.send_to_user(f'{request} created successfully!')
             self.channel.end_current_session()
             # else:
             #     await self.channel.route(dialogue=dialogue_after_confirm)

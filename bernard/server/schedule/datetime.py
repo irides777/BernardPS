@@ -1,4 +1,7 @@
+from ...session import Dialogue
 import dspy
+import re
+import datetime as dt
 
 trainset = [
     dspy.Example(current_weekday='Sat', relative_weekday_or_date='下下周五', date_delta='13'),
@@ -22,7 +25,7 @@ class WeekdayCalSig(dspy.Signature):
 relative_date_cal = dspy.ChainOfThought(WeekdayCalSig)
 relative_date_cal.load(r"D:\projects\BernardPS\bernard\server\schedule\model.json")
 
-def process_raw_date(raw_date: str) -> str:
+def process_raw_date(dialogue: Dialogue, raw_date: str) -> str:
     if type(raw_date) is dt.date or re.compile(r"^\d{4}-\d{2}-\d{2}$").match(raw_date):
         date = raw_date
     elif raw_date == 'unknown':

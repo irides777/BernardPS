@@ -54,7 +54,7 @@ class Channel:
         if reminder_regex.match(latest_reply.content):
             return 'Create Time Reminder'
         elif task_regex.match(latest_reply.content):
-            return 'Create Task with Deadline'
+            return 'Create Task'
         elif habit_regex.match(latest_reply.content):
             return 'Create Habit'
         else:

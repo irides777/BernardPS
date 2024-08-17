@@ -3,7 +3,6 @@ from pydantic import BaseModel, model_validator, Field
 import datetime as dt
 
 from ...session import SessionContext
-from .event import BaseScheduleEvent
 
 WEEKDAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 

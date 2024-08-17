@@ -10,8 +10,6 @@ from ...session import Dialogue
 from ...reply import ReplyInformationConfirmSig, ReplyQuerySig
 from ..request import RequestServer
 from .reminder import BaseReminder
-from .base_event import BaseScheduleEvent
-from .event import ScheduleEvent
 from .datetime import relative_date_cal, process_raw_date
 
 
@@ -79,7 +77,7 @@ class ReminderLLM(dspy.Module):
         #     print(date_delta)
         #     date_delta = int(date_delta)
         #     reminder_date = (dialogue.date + dt.timedelta(days=date_delta)).strftime('%Y-%m-%d')
-        reminder_date = process_raw_date(raw_reminder_date)
+        reminder_date = process_raw_date(dialogue=dialogue, raw_date=raw_reminder_date)
 
         reminder_time = self.reminder_time_constructor(dialogue=dialogue).reminder_time
         print(reminder_time)
