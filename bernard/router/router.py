@@ -27,7 +27,10 @@ class DialogueRouter:
             session['intent'] = intent
 
         logging.info(f'Intent: {session["intent"]}')
-        await self.server[session['intent']].process_dialogue(dialogue=session['dialogue'])
+        if session['intent'] == 'Update Task Progress':
+            await self.server[session['intent']].process_dialogue(dialogue=session['dialogue'], task_list=self.channel.tasks, step_map=self.channel.step_map)
+        else:
+            await self.server[session['intent']].process_dialogue(dialogue=session['dialogue'])
     
     # async def direct_process(self, dialogue: Dialogue, intent: str):
     #     await self.server[intent].process_dialogue(dialogue=dialogue)

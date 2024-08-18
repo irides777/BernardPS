@@ -24,14 +24,14 @@ class RequestServer:
     def add_request(self, request):
         raise NotImplementedError()
     
-    async def process_dialogue(self, dialogue: Dialogue):
-        request = self.request_creator(dialogue=dialogue)
+    async def process_dialogue(self, dialogue: Dialogue, **kwargs):
+        request = self.request_creator(dialogue=dialogue, **kwargs)
         unknown_fields = request.unknown_fields()
         if len(unknown_fields) == 0:
             # reply_for_confirmation = self.reply_confirm(dialogue=dialogue, information_need_check=reminder).reply
             # dialogue_after_confirm, confirm = await self.channel.send_wait_confirm(reply_for_confirmation)
             # if confirm:
-            self.add_request(request=request)
+            self.add_request(request)
             self.channel.send_to_user(f'{request} created successfully!')
             self.channel.end_current_session()
             # else:

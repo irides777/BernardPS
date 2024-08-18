@@ -36,10 +36,26 @@ class BaseTask(BaseModel):
 class BaseProgress(BaseModel):
     task_current_progress: str
     last_step_finished: bool
-    progress_update_date: LLMDate
-    next_step: str
+    current_step_of_task: str
     next_remind_date: LLMDate
     next_remind_time: LLMTime
+    next_remind_weekday: Literal["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] = Field(default=None)
+
+    @model_validator(mode='after')
+    def set_remind_weekday(cls, values):
+        date = values.next_remind_date
+        if date == 'unknown':
+            values.next_remind_weekday = 'unknown'
+        else:
+            values.next_remind_weekday = WEEKDAYS[date.weekday()]
+        return values
+
+    def unknown_fields(self):
+        ret = []
+        for i in self:
+            if i[1] == 'unknown':
+                ret.append(i[0])
+        return ret
 
 class Task(BaseModel):
     basetask: BaseTask

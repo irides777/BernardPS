@@ -8,104 +8,92 @@ from typing import Union, Literal
 
 from ...session import Dialogue
 from ...reply import ReplyInformationConfirmSig, ReplyQuerySig
+from ..request import RequestServer
 from .task import BaseTask, BaseProgress
-from .event import ScheduleEvent
 from .datetime import relative_date_cal, process_raw_date
-
+from .task_server import TaskNextRemindDateConstructorSig, TaskNextRemindTimeConstructorSig
 class TaskMatchSig(dspy.Signature):
     """ 
     You are user's assistant, user has scheduled some long term tasks, you have recorded these tasks in list. Now user is talking about some task's progress, please extract the corresponding task in your list.
     """
 
-    dialogue: Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time.")
+    dialogue: Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time. User is now talking about some task's progress. You may find the task user mentioned at the beginning of dialogue.")
     task_list: list[str] = dspy.InputField(desc="List of tasks, the task you extract must be in this list.")
-    task_user_mentioned_in_dialogue: str = dspy.OutputField(desc="The task corresponding to user mentioned in dialogue. If you can't find the appropriate task in task list, fill the field with 'unknown'. If you think there are multiple tasks in list matching the dialogue, fill the field with 'vague'. DO NOT RETURN TASK NOT IN TASK LIST, DO NOT ADD ANY EXPLANATION.")
+    task_user_mentioned_in_dialogue: str = dspy.OutputField(desc="The task corresponding to user mentioned in dialogue. If you can't find the appropriate task in task list, fill the field with 'unknown'. If you think there are multiple tasks in list matching the dialogue, fill the field with 'vague'. You return must be the same as any one in task list, DO NOT ADD '«»' ARUOUND RESULT, DO NOT RETURN TASK NOT IN TASK LIST, DO NOT ADD ANY EXPLANATION.")
 
 class ProgressContentConstructorSig(dspy.Signature):
     """   
-    You are user's assistant, user is scheduling a task, with a specific deadline and next remind time. please extract the detail of task content user mentioned in dialogue. The return should be the same language as user's input. 
+    You are user's assistant, user has scheduled a task. Now user is talking about the task's progress, please extract the detail of progress user mentioned in dialogue. The return should be the same language as user's input. 
     """
     dialogue: Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time.")
     task: str = dspy.InputField(desc="The task user is now talking about.")
-    task_current_progress: str = dspy.OutputField(desc="Current progress of the task, summary from user's message in dialogue. Please be brief and clear. Do not add any explanation or title.")
+    task_current_progress: str = dspy.OutputField(desc="Current progress of the task, summary from user's message in dialogue. Please be brief and clear. Do NOT add any explanation or title in the return. ")
 
-class TaskDeadlineDateConstructorSig(dspy.Signature):
+class TaskPlanIfFinishedSig(dspy.Signature):
     """   
-    You are user's assistant, user is scheduling a task, with a specific deadline and next remind time. please extract the deadline date of task user mentioned in dialogue. The return should be the same language as user's input (except 'unknown'). 
+    You are user's assistant, user has scheduled a task, and planned a step to finish the task. Now user is talking about the task's current progress, please identify if the planned step is finished according to the user's progress.  
     """
     dialogue: Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time")
-    deadline_date: Union[dt.date, str] = dspy.OutputField(desc="The deadline date of task user mentioned. Notice: if the date user mentioned is weekday related (e.g. next Wed, 这周五), you don't need to transform relative date into absolute date, just return exactly what user said. Otherwise, If user mentioned absolute date, return the date in format 'YYYY-MM-DD', with the current date information mentioned in dialogue. If there is insuffcient information to fill a field, just fill it with 'unknown'. DO NOT ADD ANY EXPLANATION.")
+    task: str = dspy.InputField(desc="The task user is now talking about.")
+    step: str = dspy.InputField(desc="The current step of above task user planned some while ago.")
+    if_step_finished: bool = dspy.OutputField(desc="Only True/False, indicating if the step user planned is finished according to the progress mentioned in dialogue. DO NOT ADD ANY EXPLANATION.")
 
-class TaskFirstStepConstructorSig(dspy.Signature):
+
+class TaskNextStepConstructorSig(dspy.Signature):
     """   
-    You are user's assistant, user is scheduling a task, with a specific deadline and next remind time. To finish the task, user must take the first step. Please extract the detail of first step user mentioned in dialogue. If user didn't mention first step, just fill the field with 'unknown'. The return should be the same language as user's input (except 'unknown'). 
+    You are user's assistant, user has scheduled a task. To finish the task, user must take several steps. Now user have finished some steps, please extract the detail of next step user mentioned in dialogue. If user didn't mention next step, just fill the field with 'unknown'. The return should be the same language as user's input (except 'unknown'). 
     """
     dialogue: Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time")
-    first_step: str = dspy.OutputField(desc="The first step user need to do to finish the task, be brief and clear, do not add any explanation or title. If user didn't mention first step of task, just fill the field with 'unknown'. DO NOT ADD ANY EXPLANATION.")
-
-class TaskNextRemindDateConstructorSig(dspy.Signature):
-    """   
-    You are user's assistant, user is scheduling a task, with a specific deadline. You need to remind the task to user after a while. Please extract the next remind date of task user mentioned in dialogue. The return should be the same language as user's input (except 'unknown'). 
-    """
-    dialogue: Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time")
-    next_remind_date: Union[dt.date, str] = dspy.OutputField(desc="The next remind date of task (Notice: not the deadline of task) user mentioned. Notice: if the date user mentioned is weekday related (e.g. next Wed, 这周五), you don't need to transform relative date into absolute date, just return exactly what user said. Otherwise, If user mentioned absolute date, return the date in format 'YYYY-MM-DD', with the current date information mentioned in dialogue. If there is insuffcient information to fill a field, just fill it with 'unknown'. DO NOT ADD ANY EXPLANATION.")
+    next_step: str = dspy.OutputField(desc="The next step user need to do to finish the task, be brief and clear, do not add any explanation or title. If user didn't mention next step of task, just fill the field with 'unknown'. DO NOT ADD ANY EXPLANATION.")
 
 
-class TaskNextRemindTimeConstructorSig(dspy.Signature):
-    """   
-    You are user's assistant, user is scheduling a task, with a specific deadline. You need to remind the task to user after a while. Please extract the next remind time (date is not required) of task user mentioned in dialogue. The return should be the same language as user's input (except 'unknown'). 
-    """
-    dialogue: Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time")
-    next_remind_time: Union[dt.time, Literal['unknown']] = dspy.OutputField(desc="The next remind time of task user want to set, not include date. (e.g. 10:00, 14:00, 17:30, etc.) If user doesn't mention specific time, just fill it with 'unknown'. ANY OUTPUT OTHER THAN 'unknown' DO NOT ADD ANY EXPLANATION.")
-
-class TaskCheckerSig(dspy.Signature):
-    """ 
-    Verify that the auto generated task is based on the event user mentioned in provided dialogue. Especially check the datetime and weekday.
-    """
-    dialogue: Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time")
-    task: BaseTask = dspy.InputField(desc="the task user mentioned")
-    faithfulness: bool = dspy.OutputField(desc="ONLY output True or False indicating if task is faithful to dialogue, other redundant information should be ignored. Notice that task is different from schedule event.")
-
-
-class TaskLLM(dspy.Module):
+class ProgressLLM(dspy.Module):
 
     def __init__(self):
         super().__init__()
-        self.task_content_constructor = dspy.TypedPredictor(TaskContentConstructorSig, max_retries=3)
-        self.task_deadline_date_constructor = dspy.TypedPredictor(TaskDeadlineDateConstructorSig)
-        self.task_first_step_constructor = dspy.TypedPredictor(TaskFirstStepConstructorSig)
+        self.task_matcher = dspy.TypedPredictor(TaskMatchSig)
+        self.progress_content_constructor = dspy.TypedPredictor(ProgressContentConstructorSig)
+        self.task_step_finished_identifier = dspy.TypedPredictor(TaskPlanIfFinishedSig)
+        self.task_next_step_constructor = dspy.TypedPredictor(TaskNextStepConstructorSig)
         self.task_next_remind_date_constructor = dspy.TypedPredictor(TaskNextRemindDateConstructorSig)
         self.task_next_remind_time_constructor = dspy.TypedPredictor(TaskNextRemindTimeConstructorSig)
-        self.task_checker = dspy.TypedPredictor(TaskCheckerSig)
     
-    def forward(self, dialogue: Dialogue):
+    def forward(self, dialogue: Dialogue, task_list: list[str] = [], step_map: dict[str, str] = {}):
         # reminder_reply = self.reminder_constructor(dialogue=dialogue)
         # print(reminder_reply)
-        raw_task_content = self.task_content_constructor(dialogue=dialogue).task_content
-        task_content = raw_task_content.split('\n')[0]
-        print(task_content)
+        print(task_list)
+        task_talked_about = self.task_matcher(dialogue=dialogue, task_list=task_list).task_user_mentioned_in_dialogue
+        print(task_talked_about)
 
-        raw_first_step = self.task_first_step_constructor(dialogue=dialogue).first_step
-        first_step = raw_first_step.split('\n')[0]
-        print(first_step)
+        raw_progress_content = self.progress_content_constructor(dialogue=dialogue, task=task_talked_about).task_current_progress
+        progress_content = raw_progress_content.split('\n')[0]
+        print(progress_content)
 
+        print(step_map)
 
-        raw_task_deadline_date = self.task_deadline_date_constructor(dialogue=dialogue).deadline_date
-        print(raw_task_deadline_date)
+        step_planned = step_map.get(task_talked_about, 'unknown')
+        print(step_planned)
+        step_finished = self.task_step_finished_identifier(dialogue=dialogue, task=task_talked_about, step=step_planned).if_step_finished
+
+        if step_finished:
+            next_step = self.task_next_step_constructor(dialogue=dialogue).next_step
+        else:
+            next_step = step_planned
+
+        
         raw_task_next_remind_date = self.task_next_remind_date_constructor(dialogue=dialogue).next_remind_date
         print(raw_task_next_remind_date)
-        task_deadline_date = process_raw_date(raw_task_deadline_date)
-        task_next_remind_date = process_raw_date(raw_task_next_remind_date)
+        task_next_remind_date = process_raw_date(dialogue=dialogue, raw_date=raw_task_next_remind_date)
 
         task_next_remind_time = self.task_next_remind_time_constructor(dialogue=dialogue).next_remind_time
         print(task_next_remind_time)
         # reminder_time = raw_reminder_time if raw_reminder_time != 'unknown' else '12:00'
 
-        print(f"deadline:{task_deadline_date} task_remind_date: {task_next_remind_date}, task_remind_time: {task_next_remind_time}")
-        task = BaseTask(
-            task_content=task_content,
-            deadline_date=task_deadline_date,
-            first_step=first_step,
+        print(f"task_remind_date: {task_next_remind_date}, task_remind_time: {task_next_remind_time}")
+        progress = BaseProgress(
+            task_current_progress=progress_content,
+            last_step_finished=step_finished,
+            current_step_of_task=next_step,
             next_remind_date=task_next_remind_date,
             next_remind_time=task_next_remind_time
         )
@@ -114,7 +102,7 @@ class TaskLLM(dspy.Module):
         #     self.reminder_checker(dialogue=dialogue, reminder=reminder).faithfulness,
         #     f"Reminder created {reminder} is not consistent with user mentioned in dialogue"
         # )
-        return task
+        return progress
 
 # class TaskServer:
 #     def __init__(self, channel):
@@ -139,12 +127,12 @@ class TaskLLM(dspy.Module):
 #             reply_for_more_information = self.reply_query(dialogue=dialogue, incomplete_data=task).reply
 #             self.channel.send_to_user(reply_for_more_information)
 
-class TaskServer(RequestServer):
+class ProgressServer(RequestServer):
     
     def __init__(self, channel):
-        name = 'Create Task'
-        super().__init__(name=name, channel=channel, RequestLLM=TaskLLM)
+        name = 'Create Task Update'
+        super().__init__(name=name, channel=channel, RequestLLM=ProgressLLM)
 
-    def add_task(self, task: BaseTask):
-        print(f'task added: {task}')
-        self.channel.tasks.append(task)
+    def add_request(self, progress: BaseProgress):
+        print(f'progress added: {progress}')
+        self.channel.step_map[progress.current_step_of_task] = progress.current_step_of_task

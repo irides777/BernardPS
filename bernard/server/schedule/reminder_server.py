@@ -126,6 +126,6 @@ class ReminderServer(RequestServer):
         name = 'Create Time Reminder'
         super().__init__(name=name, channel=channel, RequestLLM=ReminderLLM)
 
-    def add_reminder(self, reminder: BaseReminder):
+    def add_request(self, reminder: BaseReminder):
         print(f'Reminder added: {reminder}')
         self.channel.reminders.append(reminder)

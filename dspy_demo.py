@@ -10,7 +10,7 @@ import asyncio
 # from pydantic import BaseModel, RootModel, Field, model_serializer, field_validator, ValidationInfo
 
 from bernard.router import DialogueRouter
-from bernard.server import GeneralChatServer, ReminderServer, TaskServer
+from bernard.server import GeneralChatServer, ReminderServer, TaskServer, ProgressServer
 from bernard.channel import Channel
 from bernard.ui import CmdUI, WxautoUI
 
@@ -28,6 +28,7 @@ wx_ui = WxautoUI(wx_window=wx, user_name='irides')
 channel = Channel(ui=wx_ui)
 channel.router.add_server('Create Time Reminder', ReminderServer(channel))
 channel.router.add_server('Create Task', TaskServer(channel))
+channel.router.add_server('Update Task Progress', ProgressServer(channel))
 channel.router.add_server('Chat', GeneralChatServer(channel))
 
 # wx_ui2 = WxautoUI(wx_window=wx, user_name='123')

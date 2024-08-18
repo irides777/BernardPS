@@ -22,6 +22,7 @@ class Channel:
         self.history_sessions = []
         self.reminders = []
         self.tasks = []
+        self.step_map = {}
         self.ui = ui
     
     def _wrap_msg(self, msg, sender: Literal['User', 'Assistant']):
@@ -46,6 +47,7 @@ class Channel:
 
         reminder_regex = re.compile(r"^(reminder[:：]|提醒[:：])", re.IGNORECASE)
         task_regex = re.compile(r"^(task[:：]|任务[:：])", re.IGNORECASE)
+        progress_regex = re.compile(r"^(progress[:：]|进度[:：])", re.IGNORECASE)
         habit_regex = re.compile(r"^(habit[:：]|习惯[:：])", re.IGNORECASE)
 
         # print(latest_reply)
@@ -55,6 +57,8 @@ class Channel:
             return 'Create Time Reminder'
         elif task_regex.match(latest_reply.content):
             return 'Create Task'
+        elif progress_regex.match(latest_reply.content):
+            return 'Update Task Progress'
         elif habit_regex.match(latest_reply.content):
             return 'Create Habit'
         else:

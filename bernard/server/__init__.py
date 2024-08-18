@@ -1,2 +1,2 @@
-from .schedule import ReminderServer, TaskServer
+from .schedule import ReminderServer, TaskServer, ProgressServer
 from .chat import GeneralChatServer
