@@ -135,4 +135,4 @@ class ProgressServer(RequestServer):
 
     def add_request(self, progress: BaseProgress):
         print(f'progress added: {progress}')
-        self.channel.step_map[progress.current_step_of_task] = progress.current_step_of_task
+        self.channel.step_map[progress.task_current_progress] = progress.current_step_of_task

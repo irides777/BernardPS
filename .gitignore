@@ -1,8 +1,13 @@
 .env
 .vscode
 deprecated
+model
 __pycache__
 myapp.log
 dspy.ipynb
 local_cache
 test.py
+assertion.log
+azure_openai_usage.log
+openai_usage.log
+test.ipynb

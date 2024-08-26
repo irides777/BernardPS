@@ -27,6 +27,7 @@ class TaskDeadlineDateConstructorSig(dspy.Signature):
     """
     dialogue: Dialogue = dspy.InputField(desc="Dialogue consists of role, content and time")
     deadline_date: Union[dt.date, str] = dspy.OutputField(desc="The deadline date of task user mentioned. Notice: if the date user mentioned is weekday related (e.g. next Wed, 这周五), you don't need to transform relative date into absolute date, just return exactly what user said. Otherwise, If user mentioned absolute date, return the date in format 'YYYY-MM-DD', with the current date information mentioned in dialogue. If there is insuffcient information to fill a field, just fill it with 'unknown'. DO NOT ADD ANY EXPLANATION.")
+    next_remind_date: Union[dt.date, str] = dspy.OutputField(desc="The next remind date (TIME IS NOT REQUIRED) of task user mentioned. Caution: remind date is NOT the deadline date, if user only mentioned deadline date, please fill this field with 'unknown'. Notice: if the date user mentioned is weekday related (e.g. next Wed, 这周五), you don't need to transform relative date into absolute date, just return exactly what user said. Otherwise, If user mentioned absolute date, return the date in format 'YYYY-MM-DD', with the current date information mentioned in dialogue. If there is insuffcient information to fill a field, just fill it with 'unknown'. DO NOT ADD ANY EXPLANATION.")
 
 # class TaskFirstStepConstructorSig(dspy.Signature):
 #     """   
@@ -66,7 +67,7 @@ class TaskLLM(dspy.Module):
         self.task_content_constructor = dspy.TypedPredictor(TaskContentConstructorSig, max_retries=3)
         self.task_deadline_date_constructor = dspy.TypedPredictor(TaskDeadlineDateConstructorSig)
         # self.task_first_step_constructor = dspy.TypedPredictor(TaskFirstStepConstructorSig)
-        self.task_next_remind_date_constructor = dspy.TypedPredictor(TaskNextRemindDateConstructorSig)
+        # self.task_next_remind_date_constructor = dspy.TypedPredictor(TaskNextRemindDateConstructorSig)
         self.task_next_remind_time_constructor = dspy.TypedPredictor(TaskNextRemindTimeConstructorSig)
         self.task_checker = dspy.TypedPredictor(TaskCheckerSig)
     
@@ -84,9 +85,12 @@ class TaskLLM(dspy.Module):
         print(first_step)
 
 
-        raw_task_deadline_date = self.task_deadline_date_constructor(dialogue=dialogue).deadline_date
+        # raw_task_deadline_date = self.task_deadline_date_constructor(dialogue=dialogue).deadline_date
+        task_dates = self.task_deadline_date_constructor(dialogue=dialogue)
+        raw_task_deadline_date = task_dates.deadline_date
+        raw_task_next_remind_date = task_dates.next_remind_date
         print(raw_task_deadline_date)
-        raw_task_next_remind_date = self.task_next_remind_date_constructor(dialogue=dialogue).next_remind_date
+        # raw_task_next_remind_date = self.task_next_remind_date_constructor(dialogue=dialogue).next_remind_date
         print(raw_task_next_remind_date)
         task_deadline_date = process_raw_date(dialogue=dialogue, raw_date=raw_task_deadline_date)
         task_next_remind_date = process_raw_date(dialogue=dialogue, raw_date=raw_task_next_remind_date)

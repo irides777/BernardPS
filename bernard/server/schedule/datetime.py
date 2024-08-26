@@ -26,8 +26,10 @@ relative_date_cal = dspy.ChainOfThought(WeekdayCalSig)
 relative_date_cal.load(r"D:\projects\BernardPS\bernard\server\schedule\model.json")
 
 def process_raw_date(dialogue: Dialogue, raw_date: str) -> str:
-    if type(raw_date) is dt.date or re.compile(r"^\d{4}-\d{2}-\d{2}$").match(raw_date):
+    if type(raw_date) is dt.date:
         date = raw_date
+    elif matches := re.compile(r"\d{4}-\d{2}-\d{2}").findall(raw_date):
+        date = matches[0]
     elif raw_date == 'unknown':
         date = 'unknown'
     else:
