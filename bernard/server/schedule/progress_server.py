@@ -98,34 +98,9 @@ class ProgressLLM(dspy.Module):
             next_remind_time=task_next_remind_time
         )
 
-        # dspy.Suggest(
-        #     self.reminder_checker(dialogue=dialogue, reminder=reminder).faithfulness,
-        #     f"Reminder created {reminder} is not consistent with user mentioned in dialogue"
-        # )
+
         return progress
 
-# class TaskServer:
-#     def __init__(self, channel):
-#         self.name = 'Create Task'
-#         self.channel = channel
-#         self.reminder_creator = TaskLLM().activate_assertions(max_backtracks=1)
-#         self.reply_confirm = dspy.TypedPredictor(ReplyInformationConfirmSig)
-#         self.reply_query = dspy.TypedPredictor(ReplyQuerySig)
-
-#     def add_task(self, task: BaseTask):
-#         print(f'Task added: {task}')
-#         # self.channel.tasks.append(reminder)
-    
-#     async def process_dialogue(self, dialogue: Dialogue):
-#         task = self.task_creator(dialogue=dialogue)
-#         unknown_fields = task.unknown_fields()
-#         if len(unknown_fields) == 0:
-#             self.add_task(task=task)
-#             self.channel.send_to_user(f'task {task} created successfully!')
-#             self.channel.end_current_session()
-#         else:
-#             reply_for_more_information = self.reply_query(dialogue=dialogue, incomplete_data=task).reply
-#             self.channel.send_to_user(reply_for_more_information)
 
 class ProgressServer(RequestServer):
     

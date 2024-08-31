@@ -79,24 +79,24 @@ class TaskLLM(dspy.Module):
         raw_first_step = task_res.first_step
         task_content = raw_task_content.split('\n')[0]
         first_step = raw_first_step.split('\n')[0]
-        print(task_content)
+        # print(task_content)
 
         # raw_first_step = self.task_first_step_constructor(dialogue=dialogue).first_step
-        print(first_step)
+        # print(first_step)
 
 
         # raw_task_deadline_date = self.task_deadline_date_constructor(dialogue=dialogue).deadline_date
         task_dates = self.task_deadline_date_constructor(dialogue=dialogue)
         raw_task_deadline_date = task_dates.deadline_date
         raw_task_next_remind_date = task_dates.next_remind_date
-        print(raw_task_deadline_date)
+        # print(raw_task_deadline_date)
         # raw_task_next_remind_date = self.task_next_remind_date_constructor(dialogue=dialogue).next_remind_date
-        print(raw_task_next_remind_date)
+        # print(raw_task_next_remind_date)
         task_deadline_date = process_raw_date(dialogue=dialogue, raw_date=raw_task_deadline_date)
         task_next_remind_date = process_raw_date(dialogue=dialogue, raw_date=raw_task_next_remind_date)
 
         task_next_remind_time = self.task_next_remind_time_constructor(dialogue=dialogue).next_remind_time
-        print(task_next_remind_time)
+        # print(task_next_remind_time)
         # reminder_time = raw_reminder_time if raw_reminder_time != 'unknown' else '12:00'
 
         print(f"deadline:{task_deadline_date} task_remind_date: {task_next_remind_date}, task_remind_time: {task_next_remind_time}")
@@ -114,28 +114,7 @@ class TaskLLM(dspy.Module):
         # )
         return task
 
-# class TaskServer:
-#     def __init__(self, channel):
-#         self.name = 'Create Task'
-#         self.channel = channel
-#         self.reminder_creator = TaskLLM().activate_assertions(max_backtracks=1)
-#         self.reply_confirm = dspy.TypedPredictor(ReplyInformationConfirmSig)
-#         self.reply_query = dspy.TypedPredictor(ReplyQuerySig)
 
-#     def add_task(self, task: BaseTask):
-#         print(f'Task added: {task}')
-#         # self.channel.tasks.append(reminder)
-    
-#     async def process_dialogue(self, dialogue: Dialogue):
-#         task = self.task_creator(dialogue=dialogue)
-#         unknown_fields = task.unknown_fields()
-#         if len(unknown_fields) == 0:
-#             self.add_task(task=task)
-#             self.channel.send_to_user(f'task {task} created successfully!')
-#             self.channel.end_current_session()
-#         else:
-#             reply_for_more_information = self.reply_query(dialogue=dialogue, incomplete_data=task).reply
-#             self.channel.send_to_user(reply_for_more_information)
 
 class TaskServer(RequestServer):
     

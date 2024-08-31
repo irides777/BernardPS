@@ -23,7 +23,7 @@ class WeekdayCalSig(dspy.Signature):
     date_delta = dspy.OutputField(desc="An integer, Number of days between current date and relative weekday or date. NO EXPLANATION NEEDED.")
 
 relative_date_cal = dspy.ChainOfThought(WeekdayCalSig)
-relative_date_cal.load(r"D:\projects\BernardPS\bernard\server\schedule\model.json")
+relative_date_cal.load(r"./model.json")
 
 def process_raw_date(dialogue: Dialogue, raw_date: str) -> str:
     if type(raw_date) is dt.date:
